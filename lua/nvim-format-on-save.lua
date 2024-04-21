@@ -6,6 +6,7 @@ local M = {}
 ---@field override_ft {[string]: boolean} Override ft option
 ---@field ensure_newline boolean Ensure newline at the end of the file
 local config = {
+  enabled = true,
   ft = {},
   override_ft = {},
   ensure_newline = true,
@@ -23,8 +24,14 @@ M._included_filetypes = {}
 ---@type {[string]: boolean} Exclude when ft = "all"
 M._excluded_filetypes = {}
 
+---@type boolean Is formatter enabled?
+M._enabled = true
+
 
 M._format = function() end
+
+-- Used by M.toggle()
+M._format_fn_backup = function() end
 
 
 M._ensure_newline = function()
@@ -61,6 +68,7 @@ end
 ---@param opts Config?
 M.setup = function(opts)
   M._config = vim.tbl_deep_extend("force", M._config, opts or {})
+  M._enabled = M._config.enabled
 
   if M._config.ft == "none" then
     for filetype, should_format in pairs(M._config.override_ft) do
@@ -108,6 +116,8 @@ M.setup = function(opts)
     end
   end
 
+  -- M.toggle() uses this backup to restore the format function
+  M._format_fn_backup = M._format
 
   local format_augroup =
       vim.api.nvim_create_augroup("FormatOnSave", { clear = true })
@@ -119,6 +129,19 @@ M.setup = function(opts)
       M._format()
     end
   })
+end
+
+---@param enabled boolean? Toggle auto-formatting on or off
+M.toggle = function(enabled)
+  if enabled == nil then
+    M.toggle(not M._enabled)
+  elseif enabled == true then
+    M._format = M._format_fn_backup
+    M._enabled = true
+  elseif enabled == false then
+    M._format = function() end
+    M._enabled = false
+  end
 end
 
 ---@return Config
