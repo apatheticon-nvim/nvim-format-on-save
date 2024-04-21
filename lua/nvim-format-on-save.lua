@@ -9,6 +9,9 @@ local config = {
   ft = {},
   override_ft = {},
   ensure_newline = true,
+  formatter = function()
+    vim.lsp.buf.format { async = false }
+  end,
 }
 
 ---@type Config
@@ -35,37 +38,23 @@ M._ensure_newline = function()
 end
 
 
-M._format_all = function()
-  local log_text = "Formatting All \n"
-
+M._format_exclude = function()
   if not M._excluded_filetypes[vim.bo.filetype] then
-    log_text = log_text .. "\nFormatting all"
-    log_text = log_text .. "\nFormatting: " .. tostring(vim.bo.filetype)
-
+    M._config.formatter()
     if M._config.ensure_newline then
-      log_text = log_text .. "\nEnsure new line = true"
+      M._ensure_newline()
     end
   end
-
-  log_text = log_text .. "\n\n"
-  vim.notify(log_text)
 end
 
 
-M._format_some = function()
-  local log_text = "Formatting Some\n"
-
+M._format_include = function()
   if M._included_filetypes[vim.bo.filetype] then
-    log_text = log_text .. "\nFormatting some"
-    log_text = log_text .. "\nFormatting: " .. tostring(vim.bo.filetype)
-
+    M._config.formatter()
     if M._config.ensure_newline then
-      log_text = log_text .. "\nEnsure new line = true"
+      M._ensure_newline()
     end
   end
-
-  log_text = log_text .. "\n\n"
-  vim.notify(log_text)
 end
 
 
@@ -83,7 +72,7 @@ M.setup = function(opts)
     if vim.tbl_isempty(M._included_filetypes) then
       M._format = function() end
     else
-      M._format = M._format_some
+      M._format = M._format_include
     end
   end
 
@@ -93,7 +82,7 @@ M.setup = function(opts)
         M._excluded_filetypes[filetype] = true
       end
     end
-    M._format = M._format_all
+    M._format = M._format_exclude
   end
 
 
@@ -115,7 +104,7 @@ M.setup = function(opts)
     if vim.tbl_isempty(M._included_filetypes) then
       M._format = function() end
     else
-      M._format = M._format_some
+      M._format = M._format_include
     end
   end
 
