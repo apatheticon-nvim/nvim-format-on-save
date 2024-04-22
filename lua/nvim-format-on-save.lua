@@ -129,12 +129,14 @@ M.setup = function(opts)
       M._format()
     end
   })
+
+  M._toggle(M._config.enabled)
 end
 
 ---@param enabled boolean? Toggle auto-formatting on or off
-M.toggle = function(enabled)
+M._toggle = function(enabled)
   if enabled == nil then
-    M.toggle(not M._enabled)
+    M._toggle(not M._enabled)
   elseif enabled == true then
     M._format = M._format_fn_backup
     M._enabled = true
@@ -145,13 +147,57 @@ M.toggle = function(enabled)
 end
 
 ---@return Config
-M.get_config = function()
-  return vim.inspect(M._config)
+M._get_default_config = function()
+  return config
 end
 
-M.print_config = function()
+---@return Config
+M._get_config = function()
+  return M._config
+end
+
+M._print_config = function()
   vim.notify(vim.inspect(M._config))
 end
+
+M._is_enabled = function()
+  return M._enabled
+end
+
+M._save_without_formatting = function()
+  if not M._enabled then
+    vim.api.nvim_command("w")
+    return
+  end
+
+  M._toggle(false)
+  vim.api.nvim_command("w")
+  M._toggle(true)
+end
+
+M._call_format_fn = function()
+  M._format_fn_backup()
+end
+
+M._formatter = function()
+  M._config.formatter()
+end
+
+M._default_formatter = function()
+  config.formatter()
+end
+
+M.api = {
+  toggle = M._toggle,
+  is_enabled = M._is_enabled,
+  formatter = M._formatter,
+  default_formatter = M._default_formatter,
+  call_format_fn = M._call_format_fn,
+  get_default_config = M._get_default_config,
+  get_config = M._get_config,
+  print_config = M._print_config,
+  save_without_formatting = M._save_without_formatting,
+}
 
 return M
 
