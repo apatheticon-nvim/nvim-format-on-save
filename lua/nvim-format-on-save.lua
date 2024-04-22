@@ -2,9 +2,11 @@
 local M = {}
 
 ---@class Config
----@field ft ("all" | "none" | string[]) File types to be formatted on save
+---@field enabled boolean Enable or disable auto-formatting (including ensuring newline)
+---@field ft ("all" | "none" | string[]) File types to be auto-formatted
 ---@field override_ft {[string]: boolean} Override ft option
 ---@field ensure_newline boolean Ensure newline at the end of the file
+---@field formatter fun(): nil Function used to format the file
 local config = {
   enabled = true,
   ft = {},
