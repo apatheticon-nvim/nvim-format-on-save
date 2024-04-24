@@ -4,7 +4,7 @@
 -- TODO: Change the repo url in installation examples
 ```
 
-A neovim plugin to auto-format when a buffer is saved.
+A neovim plugin to auto-format a file on save.
 
 * [Features](#features)
 * [Installation](#installation)
@@ -31,16 +31,16 @@ Install this plugin with any plugin manager and then call `require("nvim-format-
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
-    {
-        "apatheticon/nvim-format-on-save",
-        lazy = false,
-        opts = {
-            ft = "all",
-        },
-        config = function(_, opts)
-            require("nvim-format-on-save").setup(opts)
-        end,
-    }
+{
+  "apatheticon/nvim-format-on-save",
+  lazy = false,
+  opts = {
+    ft = "all",
+  },
+  config = function(_, opts)
+    require("nvim-format-on-save").setup(opts)
+  end,
+}
 ```
 
 
@@ -50,13 +50,13 @@ Install this plugin with any plugin manager and then call `require("nvim-format-
 
 ```lua
 local opts = {
-    enabled = true,
-    ft = {},
-    override_ft = {},
-    ensure_newline = true,
-    formatter = function()
-        vim.lsp.buf.format { async = false }
-    end,
+  enabled = true,
+  ft = {},
+  override_ft = {},
+  ensure_newline = true,
+  formatter = function()
+    vim.lsp.buf.format { async = false }
+  end,
 }
 ```
 
@@ -71,8 +71,8 @@ local opts = {
 
 ```lua
 local opts = {
-    enabled = false,
-    -- enabled = true,
+  enabled = false,
+  -- enabled = true,
 }
 ```
 
@@ -88,14 +88,14 @@ This is same as setting it to `"none"`
 
 ```lua
 local opts = {
-    -- ft = "all",
-    -- ft = "none",
-    -- ft = {},
-    ft = {
-        "lua",
-        "c",
-        "javascript",
-    },
+  -- ft = "all",
+  -- ft = "none",
+  -- ft = {},
+  ft = {
+    "lua",
+    "c",
+    "javascript",
+  },
 }
 ```
 
@@ -106,9 +106,11 @@ Table containing a key-value pair. Key is filetype and value is boolean.
 
 ```lua
 local opts = {
+  override_ft = {
     lua = true,
     c = true,
     javascript = false,
+  },
 }
 ```
 
@@ -116,11 +118,11 @@ local opts = {
 
 ```lua
 local opts = {
-    ft = "none",
-    override_ft = {
-        lua = true,
-        c = true,
-    },
+  ft = "none",
+  override_ft = {
+    lua = true,
+    c = true,
+  },
 }
 ```
 
@@ -128,11 +130,11 @@ local opts = {
 
 ```lua
 local opts = {
-    ft = "all",
-    override_ft = {
-        lua = false,
-        c = false,
-    },
+  ft = "all",
+  override_ft = {
+    lua = false,
+    c = false,
+  },
 }
 ```
 
@@ -142,14 +144,14 @@ Examples:
 
 ```lua
 local opts = {
-    -- ft = {
-    --     "javascript",
-    -- },
-    override_ft = {
-        lua = false,
-        c = false,
-        javascript = true,
-    },
+  -- ft = {
+  --     "javascript",
+  -- },
+  override_ft = {
+    lua = false,
+    c = false,
+    javascript = true,
+  },
 }
 ```
 
@@ -157,12 +159,12 @@ In the above example, `ft` is commented out because it will have the same effect
 
 ```lua
 local opts = {
-    ft = "all",
-    override_ft = {
-        lua = false,
-        c = false,
-        javascript = true,
-    },
+  ft = "all",
+  override_ft = {
+    lua = false,
+    c = false,
+    javascript = true,
+  },
 }
 ```
 
@@ -175,15 +177,15 @@ For example:
 
 ```lua
 local opts = {
-    ft = {
-        "lua",
-        "c",
-        "javascript",
-    },
-    override_ft = {
-        lua = true,
-        javascript = false,
-    },
+  ft = {
+    "lua",
+    "c",
+    "javascript",
+  },
+  override_ft = {
+    lua = true,
+    javascript = false,
+  },
 }
 ```
 
@@ -194,8 +196,8 @@ In the above example, both `lua` and `c` will be auto-formatted. But `javascript
 
 ```lua
 local opts = {
-    ensure_newline = false,
-    -- ensure_newline = true,
+  ensure_newline = false,
+  -- ensure_newline = true,
 }
 ```
 
@@ -204,9 +206,10 @@ local opts = {
 
 ```lua
 local opts = {
-    formatter = function()
-        require("conform").format()
-    end,
+  formatter = function()
+    require("conform").format()
+    vim.print("File has been formatted on save")
+  end,
 }
 ```
 
@@ -229,20 +232,20 @@ local opts = {
 
 ```lua
 local opts = {
-    dev = { path = "~/projects" },
+  dev = { path = "~/projects" },
 }
 
 local plugins = {
-    {
-        "nvim-format-on-save",
-        name = "nvim-format-on-save",
-        dev = true,
-        lazy = false,
-        opts = {},
-        config = function(_, opts)
-            require("nvim-format-on-save").setup(opts)
-        end,
-    }
+  {
+    "nvim-format-on-save",
+    name = "nvim-format-on-save",
+    dev = true,
+    lazy = false,
+    opts = {},
+    config = function(_, opts)
+      require("nvim-format-on-save").setup(opts)
+    end,
+  }
 }
 
 require("lazy").setup(plugins, opts)
@@ -252,20 +255,22 @@ If the above code is not working then remove `name = "nvim-format-on-save"` and 
 
 ```lua
 local plugins = {
-    {
-        "nvim-format-on-save",
-        dir = "~/projects/nvim-format-on-save",
-        dev = true,
-        lazy = false,
-        opts = {},
-        config = function(_, opts)
-            require("nvim-format-on-save").setup(opts)
-        end,
-    }
+  {
+    "nvim-format-on-save",
+    dir = "~/projects/nvim-format-on-save",
+    dev = true,
+    lazy = false,
+    opts = {},
+    config = function(_, opts)
+      require("nvim-format-on-save").setup(opts)
+    end,
+  }
 }
 ```
 
 ## License
 
 * TODO
+
+<!-- vim:set ts=2 sts=2 sw=2: -->
 
