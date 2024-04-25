@@ -192,6 +192,7 @@ end
 M.api = {
   toggle = M._toggle,
   is_enabled = M._is_enabled,
+  ensure_newline = M._ensure_newline,
   formatter = M._formatter,
   default_formatter = M._default_formatter,
   call_format_fn = M._call_format_fn,
