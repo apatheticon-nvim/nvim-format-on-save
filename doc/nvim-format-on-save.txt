@@ -1,0 +1,435 @@
+*nvim-format-on-save* - A neovim plugin to auto-format a file on save.
+
+==============================================================================
+Contents                                        *nvim-format-on-save.contents*
+
+1. Features                                     |nvim-format-on-save.features|
+2. Installation                             |nvim-format-on-save.installation|
+3. Config                                         |nvim-format-on-save.config|
+4. API                                               |nvim-format-on-save.api|
+5. License                                       |nvim-format-on-save.license|
+
+
+==============================================================================
+1. Features                                     *nvim-format-on-save.features*
+
+* This plugin only formats the current buffer.
+* It can format the current buffer automatically when saved. (configurable)
+* It can add an empty line at the end if there is none. (configurable)
+* You can tell it which filetypes to include or exclude from auto-formatting.
+* You can provide custom formatter function.
+* Provides API functions that can be used with keymaps.
+
+
+==============================================================================
+2. Installation                             *nvim-format-on-save.installation*
+
+Install this plugin with any plugin manager and then call the following: >lua
+ require("nvim-format-on-save").setup()
+<
+
+For example:
+>lua
+  {
+    "apatheticon/nvim-format-on-save",
+    lazy = false,
+    opts = {
+      ft = "all",
+    },
+    config = function(_, opts)
+      require("nvim-format-on-save").setup(opts)
+      end,
+  }
+<
+
+==============================================================================
+3. Config                                         *nvim-format-on-save.config*
+
+Default options passed to `require("nvim-format-on-save").setup()` function:
+>lua
+  local opts = {
+    enabled = true,
+    ft = {},
+    override_ft = {},
+    ensure_newline = true,
+    formatter = function()
+      vim.lsp.buf.format { async = false }
+    end,
+  }
+<
+------------------------------------------------------------------------------
+                                           *nvim-format-on-save.config.enabled*
+  `enabled`:
+    type: `boolean`
+    default-value: `true`
+
+    Enable or disable auto-formatting (including ensuring newline)
+
+                                               *nvim-format-on-save.config.ft*
+  `ft`:
+    type: `"all" | "none" | string[]`
+    default-value: `{}`
+
+    File types to be auto-formatted. It takes the one of the following values:
+    1. `"all"`
+    2. `"none"`
+    3. table of filetypes, for example: >lua
+        { "lua", "c" }
+<
+    `"all"` option formats all filetypes on save.
+    `"none"` option does not format any filetype.
+    The table option formats the filetypes given in the table.
+
+    Example: >lua
+
+      local opts = {
+        -- ft = "all",
+        -- ft = "none",
+        -- ft = {},
+        ft = {
+          "lua",
+          "c",
+          "javascript",
+        },
+      }
+<
+                                      *nvim-format-on-save.config.override_ft*
+  `override_ft`:
+    type: `{[string]: boolean}`
+    default-value: `{}`
+
+    This option is used to override the `ft` option. It takes a table of
+    key-value pairs, where the key is the filetype and the value is boolean.
+    If the value is `true` then files with that filetype will be formatted on
+    save. If the value is `false`, those filetypes will not be formatted.
+    `override_ft` will take precedence no matter what you give in `ft` option.
+
+    Example: >lua
+
+      local opts = {
+        override_ft = {
+          lua = true,
+          c = true,
+          javascript = false,
+        }
+      }
+<
+    If `ft` is set to `"none"`, then you can use `override_ft` to turn on
+    format-on-save functionality for only some filetypes.
+
+    Example: >lua
+
+      local opts = {
+        ft = "none",
+        override_ft = {
+          lua = true,
+          c = true,
+        },
+      }
+<
+    If `ft` is set to `"all"` then you can use `override_ft` to turn off
+    format-on-save functionality for only some filetypes.
+
+    Example: >lua
+
+      local opts = {
+        ft = "all",
+        override_ft = {
+          lua = false,
+          c = false,
+        },
+      }
+<
+    What happens if `ft` is set to a table containing a certain filetype and
+    `override_ft` also sets that filetype to `false`? In this case `override_ft`
+    takes precedence. (That is why it is called `override_ft`).
+
+    In the following example, auto-formatting for `javascript` will be disable
+    even though it is included in `ft` option. This is because `javascript` is
+    set to `false` in `override_ft` option.
+    >lua
+      local opts = {
+        ft = {
+          "lua",
+          "c",
+          "javascript",
+        },
+        override_ft = {
+          lua = true,
+          javascript = false,
+        },
+      }
+<
+    Since the default value of `ft` is an empty table which is same as `"none"`,
+    you can just use `override_ft` without setting `ft`. It has the advantage
+    that even if you change the value of `ft` (e.g., from `"all"` to `"none"`),
+    the settings provided in `override_ft` will be applied no matter what.
+    (Depending on the use case, this may be a disadvantage.)
+
+    In the below example, `ft` is commented out because it will have the same
+    effect as `override_ft`.
+    >lua
+      local opts = {
+        -- ft = {
+        --     "javascript",
+        -- },
+        override_ft = {
+          lua = false,
+          c = false,
+          javascript = true,
+        },
+      }
+<
+                                   *nvim-format-on-save.config.ensure_newline*
+  `ensure_newline`:
+    type: `boolean`
+    default-value: `true`
+
+    Ensure newline at the end of the file.
+
+    If `ensure_newline` is `true` and there is no empty line at the end of a
+    file, format-on-save will add a newline character at the end of the file.
+    If there is already an empty line at the end, it will do nothing. If there
+    is more than one empty line, it will do nothing. It will not remove those
+    extra empty lines.
+
+    If `ensure_newline` is `false`, then it will do nothing. It will not remove
+    empty lines at the end.
+
+    `REMEMBER!!` This option can only add a newline character. There is no line
+    removal functionality. Setting it to `false` simply turns off this
+    functionality.
+    >lua
+      local opts = {
+        -- ensure_newline = false,
+        ensure_newline = true,
+      }
+<
+                                        *nvim-format-on-save.config.formatter*
+  `formatter`:
+    type: `fun(): nil`
+    default-value: >lua
+      function()
+        vim.lsp.buf.format { async = false }
+      end
+<
+    This is the function that is used to format the file on save. You can
+    change this function to use something else like the conform formatter.
+    You can do anything you want in this function, e.g., you can call print().
+    >lua
+      local opts = {
+        formatter = function()
+          require("conform").format()
+          vim.print("File has been formatted on save")
+        end,
+      }
+<
+
+==============================================================================
+4. API                                               *nvim-format-on-save.api*
+
+The API functions can be accessed using `require("nvim-format-on-save).api`
+
+For example:
+>lua
+  local api = require("nvim-format-on-save").api
+  api.toggle()
+  api.save_without_formatting()
+<
+
+The following is the list of all API functions:
+
+toggle()                                      |nvim-format-on-save.api.toggle|
+is_enabled()                              |nvim-format-on-save.api.is_enabled|
+ensure_newline()                      |nvim-format-on-save.api.ensure_newline|
+formatter()                                |nvim-format-on-save.api.formatter|
+default_formatter()                |nvim-format-on-save.api.default_formatter|
+call_format_fn()                      |nvim-format-on-save.api.call_format_fn|
+get_default_config()              |nvim-format-on-save.api.get_default_config|
+get_config()                              |nvim-format-on-save.api.get_config|
+print_config()                          |nvim-format-on-save.api.print_config|
+save_without_formatting()    |nvim-format-on-save.api.save_without_formatting|
+
+
+------------------------------------------------------------------------------
+                                              *nvim-format-on-save.api.toggle*
+  `toggle(boolean?): nil`:
+    This function can be used to toggle on or off format-on-save functionality
+    (which includes ensuring newline character at the end). It takes one
+    argument of type boolean.
+
+    If the argument is `true` then the formatter will be toggled on.
+    If the argument is `false` then the formatter will be toggled off.
+    If the argument is not given or `nil` then the formatter will be toggled
+    on if it is already off and toggled off if it is already on.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      api.toggle() -- Toggle on or off depending on current state
+      api.toggle(true) -- Toggle on
+      api.toggle(false) -- Toggle off
+<
+                                          *nvim-format-on-save.api.is_enabled*
+  `is_enabled(): boolean`:
+    This function can be used to check whether format-on-save is currently
+    enabled or not. It returns `true` if the formatter is currently enabled.
+    Otherwise, it will return `false`.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      if api.is_enabled() then
+        vim.print("Format-on-save is enabled")
+      else
+        vim.print("Format-on-save is disabled")
+      end
+<
+                                      *nvim-format-on-save.api.ensure_newline*
+  `ensure_newline(): nil`
+    This function can be used to ensure newline character at the end of
+    current file. See |nvim-format-on-save.config.ensure_newline| option for
+    more details.
+
+    For example, this can be used with a keymap that uses another formatter
+    like conform.
+    >lua
+      vim.keymap.set("n", "<C-f>",
+        function()
+          require("conform").format()
+          require("nvim-format-on-save").api.ensure_newline()
+        end
+      )
+<
+                                           *nvim-format-on-save.api.formatter*
+  `formatter(): nil`
+    This function can be used to call the currently configured formatter
+    function manually. For example, this can be used inside a keymap if you
+    need consistency when automatically formatting on save and manually
+    formatting using keymaps.
+
+    If no formatter was passed into `setup()` using the `formatter` option,
+    then the default formatter will be used.
+
+    This function will not ensure newline character. That is done by another
+    function. See |nvim-format-on-save.api.ensure_newline|.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      vim.keymap.set("n", "<C-f>", function() api.formatter() end)
+<
+                                   *nvim-format-on-save.api.default_formatter*
+  `default_formatter(): nil`
+    This function can be used to call the default formatter function of the
+    plugin manually. For example, this can be used inside a keymap if you need
+    consistency when automatically formatting on save and manually formatting
+    using keymaps.
+
+    This function works similar to `formatter()` but always call the default
+    formatter function that comes with this plugin. So, even if you change the
+    formatter function in `setup()` this will only call the default formatter
+    function.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      vim.keymap.set("n", "<C-f>", function() api.default_formatter() end)
+<
+                                      *nvim-format-on-save.api.call_format_fn*
+  `call_format_fn(): nil`
+    To understand what this function does, first understand how
+    |nvim-format-on-save| plugin works. |nvim-format-on-save| has two internal
+    formatter functions: `formatter()` and `format_fn()`
+
+    `formatter()` is the function that is set by the config option
+    |nvim-format-on-save.config.formatter|. The default one uses LSP to format
+    the file.
+
+    `format_fn()` is a wrapper around `formatter()`. This also includes
+    ensuring newline character at the end. This function changes depending on
+    the values set for the options |nvim-format-on-save.config.ft| and
+    |nvim-format-on-save.config.override_ft|.
+
+    `call_format_fn()` calls the currently set `format_fn()`. This is useful
+    if you want to call the `format_fn()` manually when the format-on-save is
+    disabled using the option |nvim-format-on-save.config.enabled|.
+
+    The difference between `formatter()` and `call_format_fn()` is that
+    the functionality of `formatter()` does not depend on the options
+    |nvim-format-on-save.config.ft| and
+    |nvim-format-on-save.config.override_ft|
+    It is just a plain formatter function that does not even include ensuring
+    newline character at the end of a file.
+
+    But `call_format_fn()` calls the `format_fn()` which depends on these
+    options. For example, if |nvim-format-on-save.config.ft| is `"none"` and
+    |nvim-format-on-save.config.override_ft| is set to an empty table, then
+    `format_fn()` does nothing. Therefore, `call_format_fn()` also does
+    nothing on any filetype. It will not even ensure newline character at the
+    end of the file.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      vim.keymap.set("n", "<C-f>", function() api.call_format_fn() end)
+<
+                                  *nvim-format-on-save.api.get_default_config*
+  `get_default_config(): Config`
+    This function returns the default config table.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      local config = api.get_default_config()
+      vim.print(vim.inspect(config))
+<
+                                          *nvim-format-on-save.api.get_config*
+  `get_config(): Config`
+    This function returns the current config table that is used by this
+    plugin. The current config table includes values that are passed to the
+    options used by `setup()`.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      local config = api.get_config()
+      vim.notify(vim.inspect(config))
+<
+                                        *nvim-format-on-save.api.print_config*
+  `print_config(): nil`
+    This function prints the current config table that is used by this plugin.
+    This can also be done by using |nvim-format-on-save.api.get_config|.
+
+    For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      api.print_config()
+<
+                             *nvim-format-on-save.api.save_without_formatting*
+  `save_without_formatting(): nil`
+    This function can be used to save a file without formatting it even when
+    format-on-save is enabled. This is very useful when you want to save a
+    particular file without formatting but you want to format other files on
+    save. This is a common situation that occurs.
+
+    Set a keymap to call this function when you want to save a file without
+    calling the formatter. For example:
+    >lua
+      local api = require("nvim-format-on-save").api
+      vim.keymap.set("n", "<C-s>",
+        function() api.save_without_formatting() end
+      )
+<
+
+==============================================================================
+5. License                                       *nvim-format-on-save.license*
+
+TODO
+
+
+For dev:
+novim:tw=78:ts=8:ft=vimdoc:cc=79:
+
+vim:tw=78:ts=8:ft=help:norl:noet:
+
