@@ -8,8 +8,8 @@ A neovim plugin to auto-format a file on save.
 
 * [Features](#features)
 * [Installation](#installation)
-* [Options](#options)
-* [API](#api)
+* [Usage](#usage)
+* [Config](#config)
 * [Dev Installation](#dev-installation)
 * [License](#license)
 
@@ -19,7 +19,7 @@ A neovim plugin to auto-format a file on save.
 * This plugin only formats the current buffer.
 * It can format the current buffer automatically when saved. **(configurable)**
 * It can add an empty line at the end if there is none. **(configurable)**
-* You can tell it which filetypes to include or exclude from auto-formatting.
+* You can specify which filetypes to include or exclude from auto-formatting.
 * You can provide custom formatter function.
 * Provides API functions that can be used with keymaps.
 
@@ -44,53 +44,37 @@ Install this plugin with any plugin manager and then call `require("nvim-format-
 ```
 
 
-## Options
+## Usage
 
-### Default Options
+By default, if `opts` is not provided, this plugin does not format any filetype.
+
+In the below examples `opts` should be passed to `setup()` function.
+In [lazy.nvim](https://github.com/folke/lazy.nvim) plugin manager, you can set `opts` as a field.
+
+```lua
+require("nvim-format-on-save").setup(opts)
+```
+
+To enable formatting for all filetypes:
 
 ```lua
 local opts = {
-  enabled = true,
-  ft = {},
-  override_ft = {},
-  ensure_newline = true,
-  formatter = function()
-    vim.lsp.buf.format { async = false }
-  end,
+  ft = "all",
 }
 ```
 
-* [`enabled`](#enabled): `boolean` - Enable or disable auto-formatting (including ensuring newline)
-* [`ft`](#ft): `("all" | "none" | string[])` - File types to be auto-formatted
-* [`override_ft`](#override_ft): `{[string]: boolean}` - Override `ft` option
-* [`ensure_newline`](#ensure_newline): `boolean` - Ensure newline at the end of the file
-* [`formatter`](#formatter): `fun(): nil` - Function used to format the file
-
-
-### `enabled`
+To disable formatting for all filetypes:
 
 ```lua
 local opts = {
-  enabled = false,
-  -- enabled = true,
+  ft = "none",
 }
 ```
 
-
-### `ft`
-
-* `"all"` - Format all filetypes
-* `"none"` - Do not format any filetype
-* `{ "lua", "c" }` - Table containing the names of filetypes. Format only the filetypes in the table.
-
-The default value of `ft` is an empty table (`{}`)   
-This is same as setting it to `"none"`  
+To enable formatting for only certain filetypes:
 
 ```lua
 local opts = {
-  -- ft = "all",
-  -- ft = "none",
-  -- ft = {},
   ft = {
     "lua",
     "c",
@@ -99,22 +83,7 @@ local opts = {
 }
 ```
 
-
-### `override_ft`
-
-Table containing a key-value pair. Key is filetype and value is boolean.
-
-```lua
-local opts = {
-  override_ft = {
-    lua = true,
-    c = true,
-    javascript = false,
-  },
-}
-```
-
-`true` means formatting will be done on that particular filetype no matter what the value of `ft` is. If `ft` is `"none"` then this can be used to set exceptions. For example, if you do not want to format any filetype except for `lua` and `c` then use the following.
+Another way, to enable formatting for only certain filetypes:
 
 ```lua
 local opts = {
@@ -122,108 +91,84 @@ local opts = {
   override_ft = {
     lua = true,
     c = true,
+    javascript = true,
   },
 }
 ```
 
-`false` means formatting will NOT be done on that particular filetype no matter what the value of `ft` is. If `ft` is `"all"` then this can be used to set exceptions. For example, if you want to format all filetypes except for `lua` and `c` then use the following.
+Use `override_ft` to override `ft` option.
+
+Format all filetypes except Lua and JavaScript:
 
 ```lua
 local opts = {
   ft = "all",
   override_ft = {
     lua = false,
-    c = false,
+    javascript = false,
   },
 }
 ```
 
-Since the default value of `ft` is an empty table (`{}`) which is same as `"none"`, you can just use `override_ft` without setting `ft`. It has the advantage that even if you change the value of `ft` (for example, from `"all"` to `"none"`), the settings provided in `override_ft` will be applied no matter what. (Depending on the use case, this may be a disadvantage.)
+Override `ft` table using `override_ft` table. See the example below.
 
-Examples:
-
-```lua
-local opts = {
-  -- ft = {
-  --     "javascript",
-  -- },
-  override_ft = {
-    lua = false,
-    c = false,
-    javascript = true,
-  },
-}
-```
-
-In the above example, `ft` is commented out because it will have the same effect as `override_ft`.
-
-```lua
-local opts = {
-  ft = "all",
-  override_ft = {
-    lua = false,
-    c = false,
-    javascript = true,
-  },
-}
-```
-
-In the above example, even if we change `ft` to `"none"`, `javascript` will still be auto-formatted.
-
-What if `ft` includes a table containing a certain filetype and `override_ft` sets that filetype to `false`?  
-In this case `override_ft` takes over. (That is why it is called `override_ft`). 
-
-For example:
+Even if you change `ft` to `"all"` or `"none"`, Lua and Rust will always be formatted on save.
+But JavaScript will never be formatted on save.
 
 ```lua
 local opts = {
   ft = {
     "lua",
     "c",
+    "rust",
     "javascript",
+    "typescript",
   },
   override_ft = {
     lua = true,
+    rust = true,
     javascript = false,
   },
 }
 ```
 
-In the above example, both `lua` and `c` will be auto-formatted. But `javascript` will not be auto-formatted.
 
+## Config
 
-### `ensure_newline`
-
-```lua
-local opts = {
-  ensure_newline = false,
-  -- ensure_newline = true,
-}
-```
-
-
-### `formatter`
+### Default Config
 
 ```lua
 local opts = {
+  -- Enable or disable formatter (including ensuring newline)
+  enabled = true,
+
+  -- Filetypes to be formatted on save
+  -- Values can be "all", "none", or table of filetypes (e.g., { "lua", "c" })
+  ft = {},
+
+  -- Table of key-value pairs that override `ft` option.
+  -- Lua will always be formatted and C will never be formatted in example below
+  -- e.g., { lua = true, c = false }
+  override_ft = {},
+
+  -- Ensure newline character at the end of file, i.e., empty line at the end
+  -- Setting it to false does not remove already existing empty lines at the end
+  ensure_newline = true,
+
+  -- The function that is used to format the files
   formatter = function()
-    require("conform").format()
-    vim.print("File has been formatted on save")
+    vim.lsp.buf.format { async = false }
   end,
 }
 ```
-
-
-## API
-
-* TODO
 
 
 ## Dev Installation
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
-`~/projects` is the default directory where `lazy.nvim` looks for local plugin projects. You can change that by setting `dev.path` to a custom directory when passing options to `lazy.nvim` plugin. 
+`~/projects` is the default directory where `lazy.nvim` looks for local plugin projects.
+You can change that by setting `dev.path` to a custom directory when passing options to `lazy.nvim` plugin.
 
 * Move the `nvim-format-on-save` plugin directory to `~/projects`.
 * Add `nvim-format-on-save` plugin in `lazy.nvim`.
@@ -267,6 +212,7 @@ local plugins = {
   }
 }
 ```
+
 
 ## License
 
