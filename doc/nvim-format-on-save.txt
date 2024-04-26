@@ -5,9 +5,10 @@ Contents                                        *nvim-format-on-save.contents*
 
 1. Features                                     |nvim-format-on-save.features|
 2. Installation                             |nvim-format-on-save.installation|
-3. Config                                         |nvim-format-on-save.config|
-4. API                                               |nvim-format-on-save.api|
-5. License                                       |nvim-format-on-save.license|
+3. Usage                                           |nvim-format-on-save.usage|
+4. Config                                         |nvim-format-on-save.config|
+5. API                                               |nvim-format-on-save.api|
+6. License                                       |nvim-format-on-save.license|
 
 
 ==============================================================================
@@ -28,7 +29,7 @@ Install this plugin with any plugin manager and then call the following: >lua
  require("nvim-format-on-save").setup()
 <
 
-For example:
+Example using `lazy.nvim` plugin manager:
 >lua
   {
     "apatheticon/nvim-format-on-save",
@@ -43,7 +44,89 @@ For example:
 <
 
 ==============================================================================
-3. Config                                         *nvim-format-on-save.config*
+3. Usage                                           *nvim-format-on-save.usage*
+
+If `opts` is not provided, this plugin does not format any filetype.
+
+In the below examples `opts` should be passed to `setup()` function. In
+`lazy.nvim` plugin manager, you can set `opts` as a field.
+>lua
+  require("nvim-format-on-save").setup(opts)
+<
+
+To enable formatting for all filetypes:
+>lua
+  local opts = {
+    ft = "all",
+  }
+<
+
+To disable formatting for all filetypes:
+>lua
+  local opts = {
+    ft = "none",
+  }
+<
+
+To enable formatting for only certain filetypes:
+>lua
+  local opts = {
+    ft = {
+      "lua",
+      "c",
+      "javascript",
+    },
+  }
+<
+
+Another way, to enable formatting for only certain filetypes:
+>lua
+  local opts = {
+    ft = "none",
+    override_ft = {
+      lua = true,
+      c = true,
+      javascript = true,
+    },
+  }
+<
+
+Use `override_ft` to override `ft` option.
+
+Format all filetypes except Lua and JavaScript:
+>lua
+  local opts = {
+    ft = "all",
+    override_ft = {
+      lua = false,
+      javascript = false,
+    },
+  }
+<
+
+Override `ft` table using `override_ft` table. See the example below.
+
+Even if you change `ft` to `"all"` or `"none"`, Lua and Rust will always be
+formatted on save. But JavaScript will never be formatted on save.
+>lua
+  local opts = {
+    ft = {
+      "lua",
+      "c",
+      "rust",
+      "javascript",
+      "typescript",
+    },
+    override_ft = {
+      lua = true,
+      rust = true,
+      javascript = false,
+    },
+  }
+<
+
+==============================================================================
+4. Config                                         *nvim-format-on-save.config*
 
 Default options passed to `require("nvim-format-on-save").setup()` function:
 >lua
@@ -226,7 +309,7 @@ Default options passed to `require("nvim-format-on-save").setup()` function:
 <
 
 ==============================================================================
-4. API                                               *nvim-format-on-save.api*
+5. API                                               *nvim-format-on-save.api*
 
 The API functions can be accessed using `require("nvim-format-on-save).api`
 
@@ -423,7 +506,7 @@ save_without_formatting()    |nvim-format-on-save.api.save_without_formatting|
 <
 
 ==============================================================================
-5. License                                       *nvim-format-on-save.license*
+6. License                                       *nvim-format-on-save.license*
 
 TODO
 
