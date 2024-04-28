@@ -508,8 +508,32 @@ save_without_formatting()    |nvim-format-on-save.api.save_without_formatting|
 ==============================================================================
 6. License                                       *nvim-format-on-save.license*
 
-TODO
+This work is licensed under multiple licenses (or any later version).
+You can choose between one of them if you use this work.
 
+* `MIT` (https://spdx.org/licenses/MIT.html)
+* `MIT-0` (https://spdx.org/licenses/MIT-0.html)
+* `Apache-2.0` (https://spdx.org/licenses/Apache-2.0.html)
+
+>
+  SPDX-License-Identifier: MIT OR MIT-0 OR Apache-2.0
+<
+
+------------------------------------------------------------------------------
+About MIT-0 License
+
+- `MIT-0` license is a modified version of `MIT` license with the attribution
+  paragraph removed.
+
+- `MIT-0` license is similar to `0BSD` license
+  (https://spdx.org/licenses/0BSD.html)
+
+- `MIT-0` license is OSI approved.
+  OSI page: (https://opensource.org/license/mit-0)
+
+
+==============================================================================
+Vim Modeline
 
 For dev:
 novim:tw=78:ts=8:ft=vimdoc:cc=79:

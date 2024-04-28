@@ -216,7 +216,23 @@ local plugins = {
 
 ## License
 
-* TODO
+This work is licensed under multiple licenses (or any later version).
+You can choose between one of them if you use this work.
+
+* [MIT](https://spdx.org/licenses/MIT.html)
+* [MIT-0](https://spdx.org/licenses/MIT-0.html)
+* [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html)
+
+
+```
+SPDX-License-Identifier: MIT OR MIT-0 OR Apache-2.0
+```
+
+### About MIT-0 License
+
+* MIT-0 license is a modified version of MIT license with the attribution paragraph removed.
+* MIT-0 license is similar to [0BSD](https://spdx.org/licenses/0BSD.html) license.
+* MIT-0 license is OSI approved. ([MIT-0 license OSI page](https://opensource.org/license/mit-0))
 
 <!-- vim:set ts=2 sts=2 sw=2: -->
 
