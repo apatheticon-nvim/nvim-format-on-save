@@ -2,16 +2,14 @@
 local M = {}
 
 ---@class Config
----@field enabled boolean Enable or disable auto-formatting (including ensuring newline)
+---@field enabled boolean Enable or disable auto-formatting
 ---@field ft ("all" | "none" | string[]) File types to be auto-formatted
 ---@field override_ft {[string]: boolean} Override ft option
----@field ensure_newline boolean Ensure newline at the end of the file
 ---@field formatter fun(): nil Function used to format the file
 local config = {
   enabled = true,
   ft = {},
   override_ft = {},
-  ensure_newline = true,
   formatter = function()
     vim.lsp.buf.format { async = false }
   end,
@@ -36,23 +34,9 @@ M._format = function() end
 M._format_fn_backup = function() end
 
 
-M._ensure_newline = function()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
-  local last_line = vim.api.nvim_buf_get_lines(bufnr, line_count - 1, line_count, false)[1]
-
-  if last_line ~= "" then
-    vim.api.nvim_buf_set_lines(bufnr, line_count, line_count, false, { "" })
-  end
-end
-
-
 M._format_exclude = function()
   if not M._excluded_filetypes[vim.bo.filetype] then
     M._config.formatter()
-    if M._config.ensure_newline then
-      M._ensure_newline()
-    end
   end
 end
 
@@ -60,9 +44,6 @@ end
 M._format_include = function()
   if M._included_filetypes[vim.bo.filetype] then
     M._config.formatter()
-    if M._config.ensure_newline then
-      M._ensure_newline()
-    end
   end
 end
 
@@ -192,7 +173,6 @@ end
 M.api = {
   toggle = M._toggle,
   is_enabled = M._is_enabled,
-  ensure_newline = M._ensure_newline,
   formatter = M._formatter,
   default_formatter = M._default_formatter,
   call_format_fn = M._call_format_fn,

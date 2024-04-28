@@ -18,7 +18,6 @@ A neovim plugin to auto-format a file on save.
 
 * This plugin only formats the current buffer.
 * It can format the current buffer automatically when saved. **(configurable)**
-* It can add an empty line at the end if there is none. **(configurable)**
 * You can specify which filetypes to include or exclude from auto-formatting.
 * You can provide custom formatter function.
 * Provides API functions that can be used with keymaps.
@@ -139,7 +138,7 @@ local opts = {
 
 ```lua
 local opts = {
-  -- Enable or disable formatter (including ensuring newline)
+  -- Enable or disable formatter
   enabled = true,
 
   -- Filetypes to be formatted on save
@@ -150,10 +149,6 @@ local opts = {
   -- Lua will always be formatted and C will never be formatted in example below
   -- e.g., { lua = true, c = false }
   override_ft = {},
-
-  -- Ensure newline character at the end of file, i.e., empty line at the end
-  -- Setting it to false does not remove already existing empty lines at the end
-  ensure_newline = true,
 
   -- The function that is used to format the files
   formatter = function()

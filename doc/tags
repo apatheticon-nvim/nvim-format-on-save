@@ -2,7 +2,6 @@ nvim-format-on-save	nvim-format-on-save.txt	/*nvim-format-on-save*
 nvim-format-on-save.api	nvim-format-on-save.txt	/*nvim-format-on-save.api*
 nvim-format-on-save.api.call_format_fn	nvim-format-on-save.txt	/*nvim-format-on-save.api.call_format_fn*
 nvim-format-on-save.api.default_formatter	nvim-format-on-save.txt	/*nvim-format-on-save.api.default_formatter*
-nvim-format-on-save.api.ensure_newline	nvim-format-on-save.txt	/*nvim-format-on-save.api.ensure_newline*
 nvim-format-on-save.api.formatter	nvim-format-on-save.txt	/*nvim-format-on-save.api.formatter*
 nvim-format-on-save.api.get_config	nvim-format-on-save.txt	/*nvim-format-on-save.api.get_config*
 nvim-format-on-save.api.get_default_config	nvim-format-on-save.txt	/*nvim-format-on-save.api.get_default_config*
@@ -12,7 +11,6 @@ nvim-format-on-save.api.save_without_formatting	nvim-format-on-save.txt	/*nvim-f
 nvim-format-on-save.api.toggle	nvim-format-on-save.txt	/*nvim-format-on-save.api.toggle*
 nvim-format-on-save.config	nvim-format-on-save.txt	/*nvim-format-on-save.config*
 nvim-format-on-save.config.enabled	nvim-format-on-save.txt	/*nvim-format-on-save.config.enabled*
-nvim-format-on-save.config.ensure_newline	nvim-format-on-save.txt	/*nvim-format-on-save.config.ensure_newline*
 nvim-format-on-save.config.formatter	nvim-format-on-save.txt	/*nvim-format-on-save.config.formatter*
 nvim-format-on-save.config.ft	nvim-format-on-save.txt	/*nvim-format-on-save.config.ft*
 nvim-format-on-save.config.override_ft	nvim-format-on-save.txt	/*nvim-format-on-save.config.override_ft*
