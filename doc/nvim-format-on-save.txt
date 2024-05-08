@@ -31,7 +31,7 @@ Install this plugin with any plugin manager and then call the following: >lua
 Example using `lazy.nvim` plugin manager:
 >lua
   {
-    "apatheticon/nvim-format-on-save",
+    "apatheticon-nvim/nvim-format-on-save",
     lazy = false,
     opts = {
       ft = "all",
@@ -41,6 +41,10 @@ Example using `lazy.nvim` plugin manager:
       end,
   }
 <
+If GitHub repo is not available, you can also use GitLab repo.
+Instead of `"apatheticon-nvim/nvim-format-on-save"` ,
+use `"https://gitlab.com/apatheticon-nvim/nvim-format-on-save"`
+
 
 ==============================================================================
 3. Usage                                           *nvim-format-on-save.usage*

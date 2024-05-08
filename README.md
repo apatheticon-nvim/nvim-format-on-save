@@ -1,9 +1,5 @@
 # nvim-format-on-save
 
-```lua
--- TODO: Change the repo url in installation examples
-```
-
 A neovim plugin to auto-format a file on save.
 
 * [Features](#features)
@@ -31,7 +27,7 @@ Install this plugin with any plugin manager and then call `require("nvim-format-
 
 ```lua
 {
-  "apatheticon/nvim-format-on-save",
+  "apatheticon-nvim/nvim-format-on-save",
   lazy = false,
   opts = {
     ft = "all",
@@ -41,6 +37,10 @@ Install this plugin with any plugin manager and then call `require("nvim-format-
   end,
 }
 ```
+
+If GitHub repo is not available, you can also use GitLab repo.
+Instead of `"apatheticon-nvim/nvim-format-on-save"` ,
+use `"https://gitlab.com/apatheticon-nvim/nvim-format-on-save"`
 
 
 ## Usage
