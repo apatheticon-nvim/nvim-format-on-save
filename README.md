@@ -229,4 +229,4 @@ SPDX-License-Identifier: MIT OR MIT-0 OR Apache-2.0
 * MIT-0 license is similar to [0BSD](https://spdx.org/licenses/0BSD.html) license.
 * MIT-0 license is OSI approved. ([MIT-0 license OSI page](https://opensource.org/license/mit-0))
 
-<!-- vim:set ts=2 sts=2 sw=2: -->
+<!-- vim:set ts=2 sts=2 sw=2 et: -->
